@@ -425,3 +425,37 @@ Comando: `python3 vigenere.py -d -t "LBMCOC IA AALVTEQPZ" -k LIMAO`
   (ex.: `"Ataque"` → `"Lbmcoc"` em vez de `"LBMCOC"`), seria preciso um
   ajuste adicional guardando se cada letra era maiúscula ou minúscula antes
   de converter.
+
+---
+
+## 10. Modo de quebra (`-q` / `--quebrar`)
+
+Lê `criptogramas2.txt` e `dicionario2.txt` da pasta da atividade
+(`PASTA_ATIVIDADE`, ou outra passada em `--pasta`), quebra os criptogramas
+listados em `CRIPTOGRAMAS_VIGENERE` e grava `respostas_vigenere.csv`
+(separado por `;`) com as colunas **Texto criptografado**, **Senha** e
+**Texto descriptografado**.
+
+Para cada criptograma, `quebrar()` tenta três estratégias, nesta ordem:
+
+1. **Par com um monoalfabético** (`quebrar_pelo_par`): os pares de `PARES`
+   têm o mesmo texto claro. `solucoes_monoalfabetica` gera textos claros
+   possíveis para o monoalfabético (palavras do dicionário com o mesmo
+   padrão de letras repetidas e mapeamento consistente). Para cada um, o
+   fluxo da chave é `cifra − claro`; como a chave real se repete, fica o
+   texto cujo fluxo tem o menor período (`menor_periodo`).
+2. **IC + frequência** (`quebrar_por_frequencia`): os tamanhos de chave são
+   ordenados pelo índice de coincidência médio das colunas
+   (`tamanhos_por_ic`). Para cada tamanho, cada letra da chave é estimada
+   pelo qui-quadrado contra a frequência do português e depois corrigida
+   letra por letra, mantendo a troca que aumenta a parte do texto coberta
+   por palavras do dicionário (`Dicionario.cobertura`). Só aceita quando o
+   texto inteiro vira palavras.
+3. **Busca com dicionário** (`quebrar_por_dicionario`): para textos curtos,
+   em que a frequência não funciona. O texto claro é montado palavra por
+   palavra, e cada palavra fixa letras da chave nas posições `i mod L`, que
+   não podem se contradizer.
+
+No fim, `reduzir_chave` transforma chaves repetidas na versão curta
+(`URCAURCA` → `URCA`) e um `assert` confere que `decriptografar` com a
+chave encontrada devolve exatamente o texto claro.
